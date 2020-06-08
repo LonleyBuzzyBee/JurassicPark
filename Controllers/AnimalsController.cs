@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
 using JurassicPark.Models;
 
 namespace JurassicPark.Controllers
@@ -16,7 +18,7 @@ namespace JurassicPark.Controllers
       _db = db;
     }
 
-    // GET api/animals
+    // GET api/animals'
     [HttpGet]
     public ActionResult<IEnumerable<Animal>> Get()
     {
@@ -28,6 +30,29 @@ namespace JurassicPark.Controllers
     public void Post([FromBody] Animal animal)
     {
       _db.Animals.Add(animal);
+      _db.SaveChanges();
+    }
+
+    [HttpGet("{id}")]
+    public ActionResult<Animal> Get(int id)
+    {
+      return _db.Animals.FirstOrDefault(entry => entry.AnimalId == id);
+    }
+
+    [HttpPut("{id}")]
+    public void Put(int id, [FromBody] Animal animal)
+    {
+      animal.AnimalId = id;
+      _db.Entry(animal).State = EntityState.Modified;
+      _db.SaveChanges();
+    }
+
+
+    [HttpDelete("{id}")]
+    public void Delete(int id)
+    {
+      var animalToDelete = _db.Animals.FirstOrDefault(entry=>entry.AnimalId == id);
+      _db.Animals.Remove(animalToDelete);
       _db.SaveChanges();
     }
   }

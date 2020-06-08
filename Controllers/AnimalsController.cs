@@ -14,15 +14,30 @@ namespace JurassicPark.Controllers
     private JurassicParkContext _db;
 
     public AnimalsController(JurassicParkContext db)
+
     {
       _db = db;
     }
 
-    // GET api/animals'
+
+    // GET api/animals
     [HttpGet]
-    public ActionResult<IEnumerable<Animal>> Get()
+    public ActionResult<IEnumerable<Animal>> Get(string species, string gender, string name)
     {
-      return _db.Animals.ToList();
+        var query = _db.Animals.AsQueryable();
+        if (species != null)
+        {
+        query = query.Where(entry => entry.Species == species);
+        }
+        if (gender != null)
+        {
+        query = query.Where(entry => entry.Gender == gender);
+        }
+        if (name != null)
+        {
+        query = query.Where(entry => entry.Name == name);
+        }
+        return query.ToList();
     }
 
     // POST api/animals
@@ -38,9 +53,9 @@ namespace JurassicPark.Controllers
     {
       return _db.Animals.FirstOrDefault(entry => entry.AnimalId == id);
     }
-
     [HttpPut("{id}")]
     public void Put(int id, [FromBody] Animal animal)
+
     {
       animal.AnimalId = id;
       _db.Entry(animal).State = EntityState.Modified;
@@ -50,6 +65,7 @@ namespace JurassicPark.Controllers
 
     [HttpDelete("{id}")]
     public void Delete(int id)
+
     {
       var animalToDelete = _db.Animals.FirstOrDefault(entry=>entry.AnimalId == id);
       _db.Animals.Remove(animalToDelete);
